@@ -8,7 +8,7 @@ app.secret_key = "secret-key"
 
 DATABASE = "users.db"
 GOOGLE_BOOKS_API = "https://www.googleapis.com/books/v1/volumes"
-GOOGLE_BOOKS_API_KEY = "AIzaSyCid6MrqrGX78AgFY-ki6J0e-lIG7gZK_c"
+GOOGLE_BOOKS_API_KEY = "api-key"
 
 # --------------------DB stuff--------------------
 
