@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head><title>Bookie</title></head>
+<body>
+
+<!-- this is the homepage, as a side note, i used jinja2 for these so thats why the syntax is kinda funky -->
+
+{% with messages = get_flashed_messages() %}
+    {% for message in messages %}<p>{{ message }}</p>{% endfor %}
+{% endwith %}
+
+{% if user %}
+    <p>Logged in as <strong>{{ user['username'] }}</strong></p>
+    <a href="{{ url_for('logout') }}">Log out</a>
+{% else %}
+    <p>You are not logged in.</p>
+    <a href="{{ url_for('login') }}">Log in</a> | <a href="{{ url_for('register') }}">Register</a>
+{% endif %}
+
+</body>
+</html>
