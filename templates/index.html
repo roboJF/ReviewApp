@@ -1,21 +1,14 @@
-<!DOCTYPE html>
-<html>
-<head><title>Bookie</title></head>
-<body>
+{% extends "base.html" %}
+{% block title %}Bookie{% endblock %}
+{% block content %}
 
-<!-- this is the homepage, as a side note, i used jinja2 for these so thats why the syntax is kinda funky -->
+<!-- this is the homepage of the website, basically just prompts for login if not logged in -->
 
-{% with messages = get_flashed_messages() %}
-    {% for message in messages %}<p>{{ message }}</p>{% endfor %}
-{% endwith %}
+<h1>Bookie</h1>
+<p>Search for a book above to get started.</p>
 
-{% if user %}
-    <p>Logged in as <strong>{{ user['username'] }}</strong></p>
-    <a href="{{ url_for('logout') }}">Log out</a>
-{% else %}
-    <p>You are not logged in.</p>
-    <a href="{{ url_for('login') }}">Log in</a> | <a href="{{ url_for('register') }}">Register</a>
+{% if not user %}
+<p><a href="{{ url_for('register') }}">Create an account</a> to leave reviews.</p>
 {% endif %}
 
-</body>
-</html>
+{% endblock %}

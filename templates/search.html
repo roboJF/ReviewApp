@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}Search – Bookie{% endblock %}
+{% block content %}
+
+<h2>Search results for "{{ query }}"</h2>
+
+{% if results %}
+<ul>
+    {% for book in results %}
+    <li>
+        <a href="{{ url_for('book', book_id=book['id']) }}">{{ book['title'] }}</a>
+        — {{ book['authors'] }}{% if book['year'] %} ({{ book['year'] }}){% endif %}
+    </li>
+    {% endfor %}
+</ul>
+{% else %}
+<p>No results found.</p>
+{% endif %}
+
+{% endblock %}

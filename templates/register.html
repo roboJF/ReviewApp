@@ -1,15 +1,10 @@
-<!DOCTYPE html>
-<html>
-<head><title>Register</title></head>
-<body>
+{% extends "base.html" %}
+{% block title %}Register – Bookie{% endblock %}
+{% block content %}
 
-<!-- account registration page, the flashed messages are for things like invalid passwords and creating existing accts. -->
+<!-- account registration page, just lets users register accounts -->
 
 <h2>Register</h2>
-
-{% with messages = get_flashed_messages() %}
-    {% for message in messages %}<p>{{ message }}</p>{% endfor %}
-{% endwith %}
 
 <form method="POST">
     <p><label>Username: <input type="text" name="username" required></label></p>
@@ -19,5 +14,4 @@
 
 <a href="{{ url_for('login') }}">Already have an account? Log in</a>
 
-</body>
-</html>
+{% endblock %}

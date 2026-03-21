@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head><title>{% block title %}Bookie{% endblock %}</title></head>
+<body>
+
+<!-- this is the "header" that will be on top of every page of the website, should be extended by everything else w/ jinja2 -->
+
+<p>
+    <a href="{{ url_for('index') }}"><strong>Bookie</strong></a> |
+    {% if user %}
+        Logged in as <strong>{{ user['username'] }}</strong> |
+        <a href="{{ url_for('logout') }}">Log out</a>
+    {% else %}
+        <a href="{{ url_for('login') }}">Log in</a> |
+        <a href="{{ url_for('register') }}">Register</a>
+    {% endif %}
+</p>
+
+<form action="{{ url_for('search') }}" method="GET">
+    <input type="text" name="q" placeholder="Search for a book..." value="{{ request.args.get('q', '') }}">
+    <button type="submit">Search</button>
+</form>
+
+<hr>
+
+{% with messages = get_flashed_messages() %}
+    {% for message in messages %}
+        <p><strong>{{ message }}</strong></p>
+    {% endfor %}
+{% endwith %}
+
+{% block content %}{% endblock %}
+
+</body>
+</html>

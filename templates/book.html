@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}{{ book['title'] }} – Bookie{% endblock %}
+{% block content %}
+
+<h2>{{ book['title'] }}</h2>
+<p>{{ book['authors'] }}{% if book['year'] %} ({{ book['year'] }}){% endif %}</p>
+{% if book['pages'] %}<p>{{ book['pages'] }} pages</p>{% endif %}
+{% if book['description'] %}<p>{{ book['description'] }}</p>{% endif %}
+
+{% endblock %}
