@@ -2,9 +2,69 @@
 {% block title %}{{ book['title'] }} – Bookie{% endblock %}
 {% block content %}
 
+<!-- this is the page that displays book information, also allows users to write/edit/delete and see reviews for whatever book is selected -->
+
 <h2>{{ book['title'] }}</h2>
 <p>{{ book['authors'] }}{% if book['year'] %} ({{ book['year'] }}){% endif %}</p>
 {% if book['pages'] %}<p>{{ book['pages'] }} pages</p>{% endif %}
 {% if book['description'] %}<p>{{ book['description'] }}</p>{% endif %}
+
+<hr>
+
+<h3>{% if user_review %}Your review{% else %}Leave a review{% endif %}</h3>
+
+{% if user %}
+<form action="{{ url_for('write_review', book_id=book['id']) }}" method="POST">
+    <input type="hidden" name="book_title"  value="{{ book['title'] }}">
+    <input type="hidden" name="book_author" value="{{ book['authors'] }}">
+
+    <p>
+        <label>Rating:
+            <select name="rating">
+                {% for i in range(1, 6) %}
+                <option value="{{ i }}" {% if user_review and user_review['rating'] == i %}selected{% elif not user_review and i == 5 %}selected{% endif %}>
+                    {{ i }} star{% if i > 1 %}s{% endif %}
+                </option>
+                {% endfor %}
+            </select>
+        </label>
+    </p>
+
+    <p>
+        <label>Review (optional):<br>
+            <textarea name="review_text" rows="4" cols="50">{{ user_review['review_text'] if user_review else '' }}</textarea>
+        </label>
+    </p>
+
+    <p><button type="submit">{% if user_review %}Update review{% else %}Post review{% endif %}</button></p>
+</form>
+
+{% if user_review %}
+<form action="{{ url_for('delete_review', review_id=user_review['id']) }}" method="POST">
+    <button type="submit" onclick="return confirm('Delete your review?')">Delete review</button>
+</form>
+{% endif %}
+
+{% else %}
+<p><a href="{{ url_for('login') }}">Log in</a> or <a href="{{ url_for('register') }}">register</a> to leave a review.</p>
+{% endif %}
+
+<hr>
+
+<h3>Reviews ({{ reviews|length }})</h3>
+
+{% if reviews %}
+<ul>
+    {% for review in reviews %}
+    <li>
+        <strong>{{ review['username'] }}</strong> — {{ review['rating'] }}/5
+        {% if review['review_text'] %}<br>{{ review['review_text'] }}{% endif %}
+        <br><small>{{ review['created_at'][:10] }}</small>
+    </li>
+    {% endfor %}
+</ul>
+{% else %}
+<p>No reviews yet.</p>
+{% endif %}
 
 {% endblock %}

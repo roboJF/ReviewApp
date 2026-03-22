@@ -6,7 +6,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 app = Flask(__name__)
 app.secret_key = "secret-key"
 
-DATABASE = "users.db"
+DATABASE = "bookie.db"
 GOOGLE_BOOKS_API = "https://www.googleapis.com/books/v1/volumes"
 GOOGLE_BOOKS_API_KEY = "api-key"
 
@@ -27,25 +27,51 @@ def close_connection(exception):
     if db is not None:
         db.close()
 
-#initializes/creates DB if it doesn't exist
+#initializes/creates DB if it doesn't exist, the 2 tables are the users table and the reviews table
 def init_db():
     with app.app_context():
-        get_db().execute("""
+        db = get_db()
+        db.executescript("""
             CREATE TABLE IF NOT EXISTS users (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 username TEXT UNIQUE NOT NULL,
                 password TEXT NOT NULL
-            )
+            );
+            CREATE TABLE IF NOT EXISTS reviews (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                user_id INTEGER NOT NULL,
+                book_id TEXT NOT NULL,
+                book_title TEXT NOT NULL,
+                book_author TEXT,
+                rating INTEGER NOT NULL CHECK(rating BETWEEN 1 AND 5),
+                review_text TEXT,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                UNIQUE(user_id, book_id),
+                FOREIGN KEY (user_id) REFERENCES users(id)
+            );
         """)
-        get_db().commit()
+        db.commit()
 
-# -------------------- routes --------------------
+# -------------------- authentication --------------------
 
 #retrieves the currently logged in user
 def current_user():
     if "user_id" not in session:
         return None
     return get_db().execute("SELECT * FROM users WHERE id = ?", (session["user_id"],)).fetchone()
+
+#makes it so that users are restricted from doing certain things unless logged in (leaving reviews)
+def login_required(f):
+    from functools import wraps
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        if "user_id" not in session:
+            flash("Please log in first.")
+            return redirect(url_for("login"))
+        return f(*args, **kwargs)
+    return decorated
+
+# -------------------- routes --------------------
 
 #displays homepage and shows user if logged in
 @app.route("/")
@@ -111,7 +137,7 @@ def search():
             flash(f"Search error: {e}")
     return render_template("search.html", results=results, query=query, user=current_user())
 
-#retrieves book info using google books API using the book ID from search
+#retrieves book info using google books API using the book ID from search, also displays reviews regardless of login status
 @app.route("/book/<book_id>")
 def book(book_id):
     try:
@@ -129,7 +155,58 @@ def book(book_id):
         "description": info.get("description", ""),
         "pages":       info.get("pageCount", ""),
     }
-    return render_template("book.html", book=book_data, user=current_user())
+    db = get_db()
+    reviews = db.execute("""
+        SELECT r.*, u.username FROM reviews r
+        JOIN users u ON r.user_id = u.id
+        WHERE r.book_id = ? ORDER BY r.created_at DESC
+    """, (book_id,)).fetchall()
+    user_review = None
+    if "user_id" in session:
+        user_review = db.execute(
+            "SELECT * FROM reviews WHERE user_id = ? AND book_id = ?",
+            (session["user_id"], book_id)
+        ).fetchone()
+    return render_template("book.html", book=book_data, reviews=reviews, user_review=user_review, user=current_user())
+
+
+#lets users write/edit and post reviews if logged in, adds review to DB afterwards
+@app.route("/review/<book_id>", methods=["POST"])
+@login_required
+def write_review(book_id):
+    rating      = int(request.form["rating"])
+    review_text = request.form["review_text"].strip()
+    book_title  = request.form["book_title"]
+    book_author = request.form["book_author"]
+    db = get_db()
+    existing = db.execute(
+        "SELECT id FROM reviews WHERE user_id = ? AND book_id = ?",
+        (session["user_id"], book_id)
+    ).fetchone()
+    if existing:
+        db.execute("UPDATE reviews SET rating=?, review_text=? WHERE id=?",
+                   (rating, review_text, existing["id"]))
+    else:
+        db.execute(
+            "INSERT INTO reviews (user_id, book_id, book_title, book_author, rating, review_text) VALUES (?,?,?,?,?,?)",
+            (session["user_id"], book_id, book_title, book_author, rating, review_text)
+        )
+    db.commit()
+    flash("Review saved.")
+    return redirect(url_for("book", book_id=book_id))
+
+#allows users to delete reviews if a review has been posted, and if they're logged in as well
+@app.route("/review/delete/<int:review_id>", methods=["POST"])
+@login_required
+def delete_review(review_id):
+    db = get_db()
+    review = db.execute("SELECT * FROM reviews WHERE id = ?", (review_id,)).fetchone()
+    if review and review["user_id"] == session["user_id"]:
+        book_id = review["book_id"]
+        db.execute("DELETE FROM reviews WHERE id = ?", (review_id,))
+        db.commit()
+        return redirect(url_for("book", book_id=book_id))
+    return redirect(url_for("index"))
 
 #runs when file is executed, initializes db and starts the server
 if __name__ == "__main__":
