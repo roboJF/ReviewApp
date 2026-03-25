@@ -1,5 +1,6 @@
 import sqlite3
 import requests
+from google import genai
 from flask import Flask, render_template, request, redirect, url_for, session, flash, g
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -8,7 +9,8 @@ app.secret_key = "secret-key"
 
 DATABASE = "bookie.db"
 GOOGLE_BOOKS_API = "https://www.googleapis.com/books/v1/volumes"
-GOOGLE_BOOKS_API_KEY = "api-key"
+GOOGLE_BOOKS_API_KEY = "books-api-key"
+GEMINI_API_KEY = "gemini-api-key"
 
 # --------------------DB stuff--------------------
 
@@ -207,6 +209,52 @@ def delete_review(review_id):
         db.commit()
         return redirect(url_for("book", book_id=book_id))
     return redirect(url_for("index"))
+
+#uses gemini api (gemini flash 2.5) to get book recommendations based on the last 5 reviews made, its slow but does work
+@app.route("/recommendations")
+@login_required
+def recommendations():
+    db = get_db()
+    recent_reviews = db.execute("""
+        SELECT book_title, book_author, rating, review_text
+        FROM reviews
+        WHERE user_id = ?
+        ORDER BY created_at DESC
+        LIMIT 5
+    """, (session["user_id"],)).fetchall()
+    if not recent_reviews:
+        flash("You need to write at least one review before getting recommendations.")
+        return redirect(url_for("index"))
+    review_lines = []
+    for r in recent_reviews:
+        line = f'- "{r["book_title"]}" by {r["book_author"]} — rated {r["rating"]}/5'
+        if r["review_text"]:
+            line += f': "{r["review_text"]}"'
+        review_lines.append(line)
+    reviews_text = "\n".join(review_lines)
+    prompt = f"""Based on the following book reviews a user has written, suggest 5 books they might enjoy.
+For each recommendation give the title, author, and a one sentence reason why they'd like it based on their reading history.
+Their recent reviews:
+{reviews_text}
+Format your response as a simple numbered list like:
+1. Title by Author — Reason
+2. ...and so on."""
+    recs_text = None
+    error = None
+    try:
+        client = genai.Client(api_key=GEMINI_API_KEY)
+        response = client.models.generate_content(
+            model="gemini-2.5-flash",
+            contents=prompt
+        )
+        recs_text = response.text
+    except Exception as e:
+        error = str(e)
+    return render_template("recommendations.html",
+                           recent_reviews=recent_reviews,
+                           recs_text=recs_text,
+                           error=error,
+                           user=current_user())
 
 #runs when file is executed, initializes db and starts the server
 if __name__ == "__main__":

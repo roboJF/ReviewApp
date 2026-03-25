@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}Recommendations – Bookie{% endblock %}
+{% block content %}
+
+<!-- rec. page, uses gemini to pull recommendations from the last 5 reviews made -->
+
+<h2>Book Recommendations</h2>
+<p>Based on your last {{ recent_reviews|length }} review{% if recent_reviews|length != 1 %}s{% endif %}:</p>
+
+<ul>
+    {% for r in recent_reviews %}
+    <li><strong>{{ r['book_title'] }}</strong> by {{ r['book_author'] }} — {{ r['rating'] }}/5</li>
+    {% endfor %}
+</ul>
+
+<hr>
+
+{% if error %}
+    <p><strong>Error:</strong> {{ error }}</p>
+{% elif recs_text %}
+    <h3>You might enjoy:</h3>
+    {% for line in recs_text.strip().splitlines() %}
+        {% if line.strip() %}<p>{{ line }}</p>{% endif %}
+    {% endfor %}
+{% endif %}
+
+<p><a href="{{ url_for('index') }}">← Back to home</a></p>
+
+{% endblock %}
