@@ -22,6 +22,12 @@
     {% for line in recs_text.strip().splitlines() %}
         {% if line.strip() %}<p>{{ line }}</p>{% endif %}
     {% endfor %}
+{% else %}
+    <form method="POST" onsubmit="showLoading()">
+        <button type="submit" id="generate-btn">Generate Recommendations</button>
+    </form>
+    <p id="loading-msg" style="display:none;">Thinking... this may take a few seconds.</p>
+    <script src="{{ url_for('static', filename='js/recommendations.js') }}"></script>
 {% endif %}
 
 <p><a href="{{ url_for('index') }}">← Back to home</a></p>

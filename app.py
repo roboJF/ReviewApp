@@ -211,7 +211,7 @@ def delete_review(review_id):
     return redirect(url_for("index"))
 
 #uses gemini api (gemini flash 2.5) to get book recommendations based on the last 5 reviews made, its slow but does work
-@app.route("/recommendations")
+@app.route("/recommendations", methods=["GET", "POST"])
 @login_required
 def recommendations():
     db = get_db()
@@ -225,31 +225,33 @@ def recommendations():
     if not recent_reviews:
         flash("You need to write at least one review before getting recommendations.")
         return redirect(url_for("index"))
-    review_lines = []
-    for r in recent_reviews:
-        line = f'- "{r["book_title"]}" by {r["book_author"]} — rated {r["rating"]}/5'
-        if r["review_text"]:
-            line += f': "{r["review_text"]}"'
-        review_lines.append(line)
-    reviews_text = "\n".join(review_lines)
-    prompt = f"""Based on the following book reviews a user has written, suggest 5 books they might enjoy.
+    recs_text = None
+    error = None
+    if request.method == "POST":
+        review_lines = []
+        for r in recent_reviews:
+            line = f'- "{r["book_title"]}" by {r["book_author"]} — rated {r["rating"]}/5'
+            if r["review_text"]:
+                line += f': "{r["review_text"]}"'
+            review_lines.append(line)
+        reviews_text = "\n".join(review_lines)
+
+        prompt = f"""Based on the following book reviews a user has written, suggest 5 books they might enjoy.
 For each recommendation give the title, author, and a one sentence reason why they'd like it based on their reading history.
 Their recent reviews:
 {reviews_text}
 Format your response as a simple numbered list like:
 1. Title by Author — Reason
 2. ...and so on."""
-    recs_text = None
-    error = None
-    try:
-        client = genai.Client(api_key=GEMINI_API_KEY)
-        response = client.models.generate_content(
-            model="gemini-2.5-flash",
-            contents=prompt
-        )
-        recs_text = response.text
-    except Exception as e:
-        error = str(e)
+        try:
+            client = genai.Client(api_key=GEMINI_API_KEY)
+            response = client.models.generate_content(
+                model="gemini-2.5-flash",
+                contents=prompt
+            )
+            recs_text = response.text
+        except Exception as e:
+            error = str(e)
     return render_template("recommendations.html",
                            recent_reviews=recent_reviews,
                            recs_text=recs_text,
