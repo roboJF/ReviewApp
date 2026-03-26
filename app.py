@@ -1,16 +1,20 @@
+import os
 import sqlite3
 import requests
 from google import genai
 from flask import Flask, render_template, request, redirect, url_for, session, flash, g
 from werkzeug.security import generate_password_hash, check_password_hash
+from dotenv import load_dotenv
+
+load_dotenv()
 
 app = Flask(__name__)
-app.secret_key = "secret-key"
+app.secret_key = os.getenv("FLASK_SECRET_KEY")
 
 DATABASE = "bookie.db"
 GOOGLE_BOOKS_API = "https://www.googleapis.com/books/v1/volumes"
-GOOGLE_BOOKS_API_KEY = "books-api-key"
-GEMINI_API_KEY = "gemini-api-key"
+GOOGLE_BOOKS_API_KEY = os.getenv("GOOGLE_BOOKS_API_KEY")
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
 # --------------------DB stuff--------------------
 
