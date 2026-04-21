@@ -18,7 +18,7 @@
 
 </div>
 
-{% if book['description'] %}<p>{{ book['description'] }}</p>{% endif %}
+{% if book['description'] %}<p>{{ book['description'] | safe }}</p>{% endif %}
 
 <hr>
 
