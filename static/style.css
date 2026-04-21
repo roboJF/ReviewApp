@@ -1,0 +1,133 @@
+body {
+    font-family: "Palatino Linotype", "Book Antiqua", Palatino, serif;
+    background-color: #7b5a3c;
+    background-image: url("https://www.transparenttextures.com/patterns/wood-pattern.png");
+    margin: 0;
+    color: #3e2f1c;
+    line-height: 1.8;
+}
+
+/* Centered container (paper page) */
+.container {
+    width: 70%;
+    max-width: 900px;
+    margin: 60px auto;
+    background-color: #fffaf3;
+    padding: 30px;
+    border-radius: 10px;
+    border: 1px solid #e0d3b8;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+    text-align: left;
+}
+
+/* Navbar */
+.navbar {
+    font-size: 15px;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #d6c4a7;
+}
+
+.navbar a {
+    margin-right: 10px;
+    color: #7a4e2d;
+    text-decoration: none;
+}
+
+.navbar a:hover {
+    text-decoration: underline;
+}
+
+.navbar strong {
+    font-size: 16px;
+}
+
+/* Links */
+a {
+    color: #7a4e2d;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+/* Titles (more “book-like”) */
+h1 {
+    font-size: 44px;
+    margin-bottom: 10px;
+    letter-spacing: 1px;
+    border-bottom: 1px solid #d6c4a7;
+    padding-bottom: 8px;
+    color: #5c3b21;
+}
+
+h2 {
+    font-size: 28px;
+    margin-top: 20px;
+    margin-bottom: 10px;
+    color: #5c3b21;
+}
+
+h3 {
+    font-size: 20px;
+    margin-bottom: 8px;
+    color: #5c3b21;
+}
+
+/* Body text */
+p {
+    font-size: 18px;
+    line-height: 1.8;
+}
+
+/* Inputs */
+input, textarea, select {
+    padding: 6px;
+    margin-top: 5px;
+    border: 1px solid #d6c4a7;
+    background-color: #fffaf3;
+    border-radius: 4px;
+    font-family: inherit;
+    font-size: 14px;
+}
+
+/* Buttons */
+button {
+    padding: 6px 12px;
+    background-color: #7a4e2d;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+button:hover {
+    background-color: #5c3b21;
+}
+
+/* Lists */
+ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+/* Card style (reviews + search results) */
+li {
+    background: #fffaf3;
+    margin-bottom: 12px;
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid #e0d3b8;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+
+/* Flash messages */
+.flash-message {
+    background-color: #f0e3c2;
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px solid #d6c4a7;
+    margin-bottom: 10px;
+}
