@@ -138,6 +138,7 @@ def search():
                     "title":   info.get("title", "Unknown Title"),
                     "authors": ", ".join(info.get("authors", ["Unknown Author"])),
                     "year":    info.get("publishedDate", "")[:4],
+                    "thumbnail": info.get("imageLinks", {}).get("thumbnail", "")
                 })
         except requests.exceptions.RequestException as e:
             flash(f"Search error: {e}")
@@ -160,6 +161,7 @@ def book(book_id):
         "year":        info.get("publishedDate", "")[:4],
         "description": info.get("description", ""),
         "pages":       info.get("pageCount", ""),
+        "thumbnail":   info.get("imageLinks", {}).get("thumbnail", ""),
     }
     db = get_db()
     reviews = db.execute("""

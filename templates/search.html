@@ -9,9 +9,20 @@
 {% if results %}
 <ul>
     {% for book in results %}
-    <li>
-        <a href="{{ url_for('book', book_id=book['id']) }}">{{ book['title'] }}</a>
-        — {{ book['authors'] }}{% if book['year'] %} ({{ book['year'] }}){% endif %}
+    <li style="display: flex; gap: 15px; align-items: center;">
+
+        {% if book['thumbnail'] %}
+            <img src="{{ book['thumbnail'] }}" width="60">
+        {% endif %}
+
+        <div>
+            <a href="{{ url_for('book', book_id=book['id']) }}">
+                <strong>{{ book['title'] }}</strong>
+            </a>
+            <br>
+            {{ book['authors'] }}{% if book['year'] %} ({{ book['year'] }}){% endif %}
+        </div>
+
     </li>
     {% endfor %}
 </ul>

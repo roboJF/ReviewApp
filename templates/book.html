@@ -4,9 +4,20 @@
 
 <!-- this is the page that displays book information, also allows users to write/edit/delete and see reviews for whatever book is selected -->
 
-<h2>{{ book['title'] }}</h2>
-<p>{{ book['authors'] }}{% if book['year'] %} ({{ book['year'] }}){% endif %}</p>
-{% if book['pages'] %}<p>{{ book['pages'] }} pages</p>{% endif %}
+<div style="display: flex; gap: 20px; align-items: flex-start;">
+
+    {% if book['thumbnail'] %}
+        <img src="{{ book['thumbnail'] }}" width="120">
+    {% endif %}
+
+    <div>
+        <h2>{{ book['title'] }}</h2>
+        <p>{{ book['authors'] }}{% if book['year'] %} ({{ book['year'] }}){% endif %}</p>
+        {% if book['pages'] %}<p>{{ book['pages'] }} pages</p>{% endif %}
+    </div>
+
+</div>
+
 {% if book['description'] %}<p>{{ book['description'] }}</p>{% endif %}
 
 <hr>
