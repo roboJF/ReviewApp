@@ -91,18 +91,18 @@
 
         <span class="stars">
             {% for i in range(1, 6) %}
-                {% if i <= review{'rating'} %}
+                {% if i <= review['rating'] %}
                     ★
                 {% else %}
                     ☆
                 {% endif %}
-                    
+            {% endfor %}        
         </span>
         {% if review['review_text'] %}
             <br>{{ review['review_text'] }}
         {% endif %}
 
-        <br><small>{{ review</small>
+        <br><small>Reviewed on {{ review['created_at'] }}</small>
     </li>
     {% endfor %}
 </ul>

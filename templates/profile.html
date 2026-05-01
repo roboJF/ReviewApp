@@ -10,7 +10,7 @@
         <p>
             <strong>Average Rating:</strong>
                 {% if avg_rating %}
-                    {% if i in range (1, 6) %}
+                    {% for i in range (1, 6) %}
                     
                         {% if i <= avg_rating|round(0, 'floor') %}
                             ★
@@ -33,7 +33,7 @@
         <ul>
             {% for review in reviews %}
                 <li>
-                    <a href="{{ url_for('book_detail', book_id=review['book_id']) }}">{{ review['book_title'] }}</a> -
+                    <a href="{{ url_for('book', book_id=review['book_id']) }}">{{ review['book_title'] }}</a> -
                 
                 </h3>
                 
