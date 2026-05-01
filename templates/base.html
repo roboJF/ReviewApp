@@ -12,6 +12,7 @@
                 <a href="{{ url_for('index') }}"><strong>Bookie</strong></a> |
                 {% if user %}
                     Logged in as <strong>{{ user['username'] }}</strong> |
+                    <a href="{{ url_for('profile') }}">Profile</a> |
                     <a href="{{ url_for('recommendations') }}">AI Recommendations</a> |
                     <a href="{{ url_for('logout') }}">Log out</a>
                 {% else %}

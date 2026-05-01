@@ -10,7 +10,7 @@ load_dotenv(dotenv_path=".env")
 
 app = Flask(__name__)
 app.secret_key = os.getenv("FLASK_SECRET_KEY")
-print("SECRET_KEY:", os.getenv("FLASK_SECRET_KEY"))  # Debugging line to check if the secret key is loaded
+
 
 DATABASE = "bookie.db"
 GOOGLE_BOOKS_API = "https://www.googleapis.com/books/v1/volumes"
@@ -170,13 +170,20 @@ def book(book_id):
         JOIN users u ON r.user_id = u.id
         WHERE r.book_id = ? ORDER BY r.created_at DESC
     """, (book_id,)).fetchall()
+
+    avg_rating = db.execute("""
+        SELECT AVG(rating) AS avg_rating
+        FROM reviews
+        WHERE book_id = ?
+    """, (book_id,)).fetchone()["avg_rating"]
+
     user_review = None
     if "user_id" in session:
         user_review = db.execute(
             "SELECT * FROM reviews WHERE user_id = ? AND book_id = ?",
             (session["user_id"], book_id)
         ).fetchone()
-    return render_template("book.html", book=book_data, reviews=reviews, user_review=user_review, user=current_user())
+    return render_template("book.html", book=book_data, reviews=reviews, user_review=user_review, avg_rating=avg_rating, user=current_user())
 
 
 #lets users write/edit and post reviews if logged in, adds review to DB afterwards
@@ -264,6 +271,28 @@ Format your response as a simple numbered list like:
                            recs_text=recs_text,
                            error=error,
                            user=current_user())
+
+#displays user profile page with all their reviews and some stats about their reviews (avg rating, total reviews, etc.)
+@app.route("/profile")
+@login_required
+def profile():
+    db = get_db()
+    
+    reviews = db.execute("""
+        SELECT *
+        FROM reviews
+        WHERE user_id = ? ORDER BY created_at DESC
+        """, (session["user_id"],)).fetchall()
+    
+    stats = db.execute("""
+        SELECT 
+            COUNT(*) AS total_reviews,
+            AVG(rating) AS avg_rating
+        FROM reviews
+        WHERE user_id = ?
+    """, (session["user_id"],)).fetchone()
+
+    return render_template("profile.html", reviews=reviews, total_reviews=stats["total_reviews"], avg_rating=stats["avg_rating"], user=current_user(), )
 
 #runs when file is executed, initializes db and starts the server
 if __name__ == "__main__":

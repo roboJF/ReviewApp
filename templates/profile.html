@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block content%}
+<h1>{{ user["username"] }}'s Profile</h1>
+
+
+<div>
+    <p><strong>Total Reviews:</strong>  {{ total_reviews }}</p>
+
+        <p>
+            <strong>Average Rating:</strong>
+                {% if avg_rating %}
+                    {% if i in range (1, 6) %}
+                    
+                        {% if i <= avg_rating|round(0, 'floor') %}
+                            ★
+                        {% else %}
+                            ☆
+                        {% endif %}
+                    {% endfor %}
+                    {{ "%.1f"|format(avg_rating) }}/5
+                {% else %}
+                    No ratings yet
+                {% endif %}
+        </p>
+    </div>
+
+    <hr>
+
+    <h2>Your Reviews</h2>
+
+    {% if reviews %}
+        <ul>
+            {% for review in reviews %}
+                <li>
+                    <a href="{{ url_for('book_detail', book_id=review['book_id']) }}">{{ review['book_title'] }}</a> -
+                
+                </h3>
+                
+                <p><strong>Author:</strong> {{ review["book_author"] }}</p>
+
+                <p></p>
+                    <strong>Rating:</strong>
+                    <span class="stars">
+                        {% for i in range(1, 6) %}
+                            {% if i <= review['rating'] %}
+                                ★
+                            {% else %}
+                                ☆
+                            {% endif %}
+                        {% endfor %}
+                    </span>
+                    {{ review['rating'] }}/5
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>You haven't written any reviews yet.</p>
+    {% endif %}
+{% endblock %}
