@@ -12,6 +12,25 @@
 
     <div>
         <h2>{{ book['title'] }}</h2>
+        
+        {% if avg_rating %}
+        <p>
+            Average rating:
+            <span class="stars">
+                {% for i in range(1, 6) %}
+                    {% if i <= avg_rating|round(0, 'floor') %}
+                        ★
+                    {% else %}
+                        ☆
+                    {% endif %}
+                {% endfor %}
+            </span>
+            {{ "%.1f"|format(avg_rating) }}/5
+        </p>
+        {% else %}
+        <p>No ratings yet</p>
+        {% endif %}
+        
         <p>{{ book['authors'] }}{% if book['year'] %} ({{ book['year'] }}){% endif %}</p>
         {% if book['pages'] %}<p>{{ book['pages'] }} pages</p>{% endif %}
     </div>
@@ -68,9 +87,22 @@
 <ul>
     {% for review in reviews %}
     <li>
-        <strong>{{ review['username'] }}</strong> — {{ review['rating'] }}/5
-        {% if review['review_text'] %}<br>{{ review['review_text'] }}{% endif %}
-        <br><small>{{ review['created_at'][:10] }}</small>
+        <strong>{{ review['username'] }}</strong> — 
+
+        <span class="stars">
+            {% for i in range(1, 6) %}
+                {% if i <= review{'rating'} %}
+                    ★
+                {% else %}
+                    ☆
+                {% endif %}
+                    
+        </span>
+        {% if review['review_text'] %}
+            <br>{{ review['review_text'] }}
+        {% endif %}
+
+        <br><small>{{ review</small>
     </li>
     {% endfor %}
 </ul>

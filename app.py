@@ -6,10 +6,11 @@ from flask import Flask, render_template, request, redirect, url_for, session, f
 from werkzeug.security import generate_password_hash, check_password_hash
 from dotenv import load_dotenv
 
-load_dotenv()
+load_dotenv(dotenv_path=".env")
 
 app = Flask(__name__)
 app.secret_key = os.getenv("FLASK_SECRET_KEY")
+print("SECRET_KEY:", os.getenv("FLASK_SECRET_KEY"))  # Debugging line to check if the secret key is loaded
 
 DATABASE = "bookie.db"
 GOOGLE_BOOKS_API = "https://www.googleapis.com/books/v1/volumes"
