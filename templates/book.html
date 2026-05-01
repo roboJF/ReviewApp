@@ -87,7 +87,7 @@
 <ul>
     {% for review in reviews %}
     <li>
-        <strong>{{ review['username'] }}</strong> — 
+        <strong><a href="{{ url_for('profile', username=review['username']) }}">{{ review['username'] }}</a></strong> — 
 
         <span class="stars">
             {% for i in range(1, 6) %}

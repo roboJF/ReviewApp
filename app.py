@@ -273,16 +273,20 @@ Format your response as a simple numbered list like:
                            user=current_user())
 
 #displays user profile page with all their reviews and some stats about their reviews (avg rating, total reviews, etc.)
-@app.route("/profile")
-@login_required
-def profile():
+@app.route("/profile/<username>")
+def profile(username):
     db = get_db()
-    
+
+    profile_user = db.execute("SELECT * FROM users WHERE username = ?", (username,)).fetchone()
+    if not profile_user:
+        flash("User not found.")
+        return redirect(url_for("index"))
+
     reviews = db.execute("""
         SELECT *
         FROM reviews
         WHERE user_id = ? ORDER BY created_at DESC
-        """, (session["user_id"],)).fetchall()
+        """, (profile_user["id"],)).fetchall()
     
     stats = db.execute("""
         SELECT 
@@ -290,9 +294,9 @@ def profile():
             AVG(rating) AS avg_rating
         FROM reviews
         WHERE user_id = ?
-    """, (session["user_id"],)).fetchone()
+    """, (profile_user["id"],)).fetchone()
 
-    return render_template("profile.html", reviews=reviews, total_reviews=stats["total_reviews"], avg_rating=stats["avg_rating"], user=current_user(), )
+    return render_template("profile.html", reviews=reviews, total_reviews=stats["total_reviews"], avg_rating=stats["avg_rating"], user=current_user(), profile_user = profile_user)
 
 #runs when file is executed, initializes db and starts the server
 if __name__ == "__main__":
