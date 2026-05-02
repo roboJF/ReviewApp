@@ -9,7 +9,11 @@
 
 <ul>
     {% for r in recent_reviews %}
-    <li><strong>{{ r['book_title'] }}</strong> by {{ r['book_author'] }} — {{ r['rating'] }}/5</li>
+    <li><strong>{{ r['book_title'] }}</strong> by {{ r['book_author'] }} — {{ r['rating'] }}/5
+    {% if r['review_text'] %}
+        <br><em>{{ r['review_text'] }}</em>
+    {% endif %}
+    </li>
     {% endfor %}
 </ul>
 
